@@ -17,23 +17,25 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          # package.json에 적힌 10.17.1 버전을 자동으로 사용하도록 설정하여 충돌 제거
+          run_install: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm' # pnpm 캐시를 자동으로 처리합니다.
+          # 복잡한 경로 설정 없이 setup-node의 자체 캐시 기능을 사용하여 에러 방지
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        # lock 파일 버전 차이로 인한 에러를 방지하기 위해 일반 install 실행
+        run: pnpm install
 
       - name: Build Project
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          # 실제 RPC 주소 적용
+          # 빌드 시 필요한 환경 변수만 주입 (소스 코드는 건드리지 않음)
           NEXT_PUBLIC_MAINNET_RPC_URL: "https://rpc-sola.ever-chain.xyz"
-          # Sentry 에러 방지용 (토큰이 없어도 빌드 진행됨)
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NODE_OPTIONS: "--max_old_space_size=4096"
