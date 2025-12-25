@@ -35,7 +35,8 @@ interface State {
     status: ClusterStatus;
 }
 
-const DEFAULT_CUSTOM_URL = 'http://localhost:8899';
+// 기본 커스텀 URL을 당신의 RPC 서브도메인으로 변경
+const DEFAULT_CUSTOM_URL = 'https://rpc-sola.ever-chain.xyz';
 
 function clusterReducer(state: State, action: Action): State {
     switch (action.status) {
@@ -163,6 +164,7 @@ async function updateCluster(dispatch: Dispatch, cluster: Cluster, customUrl: st
         }
         dispatch({
             cluster,
+            clusterInfo: undefined,
             customUrl,
             status: ClusterStatus.Failure,
         });

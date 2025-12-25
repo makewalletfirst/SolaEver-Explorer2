@@ -45,7 +45,7 @@ export function clusterName(cluster: Cluster): string {
 }
 
 // 기본 메인넷 URL을 당신의 SolaEver 노드 주소로 변경
-export const MAINNET_BETA_URL = 'http://localhost:8899';
+export const MAINNET_BETA_URL = 'https://rpc-sola.ever-chain.xyz';
 export const TESTNET_URL = 'https://api.testnet.solana.com';
 export const DEVNET_URL = 'https://api.devnet.solana.com';
 export const SIMD296_URL = 'https://simd-0296.surfnet.dev:8899';
