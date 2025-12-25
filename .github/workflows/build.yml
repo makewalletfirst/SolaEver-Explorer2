@@ -1,0 +1,54 @@
+name: SolaEver Explorer Build Check
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Project
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          # 빌드 시 타입 체크 및 Sentry 에러로 인한 중단 방지
+          NEXT_PUBLIC_MAINNET_RPC_URL: "https://rpc-sola.ever-chain.xyz"
+          NEXT_PUBLIC_DEVNET_RPC_URL: "https://api.devnet.solana.com"
+          NEXT_PUBLIC_TESTNET_RPC_URL: "https://api.testnet.solana.com"
+          # Sentry 토큰이 없어도 빌드가 넘어가도록 설정
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          NODE_OPTIONS: "--max_old_space_size=4096"
